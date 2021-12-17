@@ -1,17 +1,17 @@
-
 import './App.css';
 import ResponsiveNavbar from './components/ResponsiveNavbar'
-import LoginForm from './components/LoginForm';
+import {useEffect} from "react";
 
 
 function App() {
-  
-  return (
-    
-    <div className="App">
-        <ResponsiveNavbar/>
-        
 
+    useEffect(() => {
+        document.title = "Board'L"
+    }, [])
+
+  return (
+      <div className="App">
+        <ResponsiveNavbar/>
     </div>
   );
 }
