@@ -1,20 +1,37 @@
 import React, { Component } from 'react'
 import {Table} from 'react-bootstrap'
 import InscriptionLineComp from './InscriptionLineComp'
-import {getInscriptions} from "../API";
-
+import {getInscriptions} from "../../Utils/API";
 
 export default class InscriptionComp extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            inscriptions: []
+            inscriptions: [],
+            loadInscriptions : true,
         }
     }
 
     componentDidMount() {
-        getInscriptions().then(result => this.setState({inscriptions : result}));
+        this.mounted = true;
+        getInscriptions().then(result => {
+            this.setState({inscriptions : result})
+        }).catch((error) => alert(error));
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if(this.state.loadInscriptions){
+            getInscriptions()
+                .then(result => {
+                    if(prevState.inscription !== result && this.mounted)
+                        this.setState({inscriptions : result})
+                })
+                .catch(error => alert(error));
+        }
+    }
+    componentWillUnmount() {
+        this.mounted = false;
     }
 
     render() {
@@ -33,9 +50,7 @@ export default class InscriptionComp extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                    {
-                        this.state.inscriptions.map((inscription) => <InscriptionLineComp inscriptionId={inscription.inscriptionid} eventId={inscription.eventid} userId={inscription.userid} firstName={inscription.firstname} name={inscription.name} eventDescription={inscription.eventdescription} />  )
-                    }
+                        {this.state.inscriptions.map((inscription) => <InscriptionLineComp key={inscription.inscriptionid} inscriptionId={inscription.inscriptionid} eventId={inscription.eventid} userId={inscription.userid} firstName={inscription.firstname} name={inscription.name} eventDescription={inscription.eventdescription} />  )}
                     </tbody>
                 </Table>
             </div>

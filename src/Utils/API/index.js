@@ -30,12 +30,22 @@ const deleteUser = async (userid) => {
     else throw new Error("L'identifiant est obligatoire");
 }
 
-const getCategories = async () => {
-    return await api.getCategories();
+const updateUser = async (userId, modifiedUser) => {
+    return await api.updateUser(userId, modifiedUser);
 }
 
-const getCategory = async (categoryId) => {
-    return await api.getCategory(categoryId);
+const grantUser = async (userid, grantInfo) => {
+    return await api.grantUser(userid, grantInfo);
+}
+
+// Game Categories
+
+const getGameCategories = async () => {
+    return await api.getGameCategories();
+}
+
+const getGameCategory = async (categoryId) => {
+    return await api.getGameCategory(categoryId);
 }
 
 const postGameCategory = async (addedGameCategory) => {
@@ -50,23 +60,57 @@ const updateGameCategory = async (gameCategoryId,updatedGameCategory) => {
     return await api.updateGameCategory(gameCategoryId,updatedGameCategory);
 }
 
+// Inscriptions
+
 const getInscriptions = async () => {
     return await api.getInscriptions();
 }
 
-const getInscription = async () => {
-    return await api.getInscription();
+const getInscription = async (inscriptionId) => {
+    return await api.getInscription(inscriptionId);
 }
+
+const postInscription = async (addedInscription) => {
+    return await api.addInscription(addedInscription);
+}
+
 const deleteInscription = async (inscriptionId) => {
     return await api.deleteInscription(inscriptionId)
 }
+
+const updateInscription = async (inscriptionId, addedInscription) => {
+    return await api.updateInscription(inscriptionId, addedInscription);
+}
+
+// Events
 
 const getEvents = async () => {
     return await api.getEvents();
 }
 
+const getPendingEvents = async () => {
+    return await api.getPendingEvents();
+}
+
 const getEvent = async (eventId) => {
     return await api.getEvent(eventId);
+}
+
+const addEvent  = async (addedEvent) => {
+    return await api.addEvent(addedEvent);
+}
+
+const updateEvent = async (eventId, modifiedEvent) => {
+    return await api.updateEvent(eventId, modifiedEvent);
+}
+
+const verifyEvent = async (eventid, verification) => {
+    return await api.verifyEvent(eventid, verification);
+}
+
+const deleteEvent = async (eventId) =>  {
+    return await api.deleteEvent(eventId);
+
 }
 
 export {
@@ -74,15 +118,25 @@ export {
     getUsers,
     getUser,
     deleteUser,
+    grantUser,
     postUser,
-    getCategories,
-    getCategory,
+    updateUser,
+    getGameCategories,
+    getGameCategory,
     deleteGameCategory,
     postGameCategory,
     updateGameCategory,
     getInscriptions,
     getInscription,
+    postInscription,
     deleteInscription,
+    updateInscription,
     getEvents,
-    getEvent
+    getPendingEvents,
+    getEvent,
+    addEvent,
+    updateEvent,
+    verifyEvent,
+    deleteEvent
+
 }

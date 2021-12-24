@@ -1,16 +1,12 @@
 import React, { Component } from 'react'
 import {Button} from "react-bootstrap"
-import axios from "axios";
+import {deleteEvent} from "../../Utils/API";
 
 export default class EventLineComp extends Component {
 
     deleteHandler = event => {
-        alert(` L'élément ${this.props.eventId} du tableau a été supprimé`);
         event.preventDefault();
-        axios.delete(`http://localhost:3001/event/${this.props.eventId}`)
-            .then(res =>
-                console.log(res.data)
-            );
+        deleteEvent(this.props.eventId).then(res =>res.data).catch((error) => alert(error));
     }
 
     render() {

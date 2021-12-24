@@ -1,18 +1,19 @@
 import React, {Component} from 'react';
 import {Button, Col, Form, Row} from "react-bootstrap";
-import {addUser} from "../API/http";
+import {postUser} from "../../Utils/API";
+import {Link} from "react-router-dom";
 
-class AddUserComp extends Component {
+export default class AddUserComp extends Component {
     constructor(props) {
         super(props);
         this.state = {
             firstname : "",
-            name : "",
+            lastname : "",
             birthdate : "",
-            isAdmin : false,
+            isadmin : true,
             email : "",
-            password : ""
-
+            password : "",
+            photopath: "c:/photos/1"
         }
         this.handleChange = this.handleChange.bind(this)
         this.submitHandler = this.submitHandler.bind(this)
@@ -30,36 +31,39 @@ class AddUserComp extends Component {
     }
 
     async submitHandler() {
-        const formatedDate = this.state.birthdate.toString().slice(5,7) + "-" + this.state.birthdate.toString().slice(8,10) + "-" + this.state.birthdate.toString().slice(0,4) ;
-        this.setState({birthdate : formatedDate})
-        //await addUser(this.state);
-        console.log(formatedDate);
+        let isValid = true;
+        const regexDate = /^\d{4}[-]\d{2}[-]\d{2}$/
+        for (const state in this.state ) {
+            if((this.state[state] === "" || this.state[state] === undefined))
+                isValid = false;
+            else if (state === "birthdate"){
+                if(!this.state[state].match(regexDate))
+                    isValid = false;
+            }
+        }
+
+        isValid ? await postUser(this.state).then(res => res.data).catch((error) => alert(error)) : alert("Veuillez remplir tous les champs et la date doit être au format yyyy-mm-dd");
+
+
     }
-
-
 
     render() {
         return (
-            <div>
+            <div className="container">
                 <Form>
                     <Form.Group as={Row} className="mb-3" >
                         <Form.Label column sm="2" >Prénom</Form.Label>
-                        <Col sm="4"><Form.Control value={this.state.firstname} onChange={this.handleChange} id="firstname" name="firstname"/></Col>
+                        <Col sm="4"><Form.Control  value={this.state.firstname} onChange={this.handleChange} id="firstname" name="firstname"/></Col>
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-3" >
                         <Form.Label column sm="2">Nom</Form.Label>
-                        <Col sm="4"><Form.Control value={this.state.name} onChange={this.handleChange} id="name" name="name" /></Col>
+                        <Col sm="4"><Form.Control value={this.state.name} onChange={this.handleChange} id="lastname" name="lastname" /></Col>
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-3" >
                         <Form.Label column sm="2">Date de naissance</Form.Label>
-                        <Col sm="4"><Form.Control type="date" value={this.state.birthdate} onChange={this.handleChange} id="birthdate" name="birthdate" /></Col>
-                    </Form.Group>
-
-                    <Form.Group as={Row} className="mb-3" >
-                        <Form.Label column sm="2">Est admin</Form.Label>
-                        <Col sm="1"><Form.Check checked={this.state.isAdmin} onChange={this.handleChange} id="isAdmin" name="isAdmin" /></Col>
+                        <Col sm="4"><Form.Control type="text" value={this.state.birthdate.slice(0,10)} onChange={this.handleChange} id="birthdate" name="birthdate" /></Col>
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-3" >
@@ -72,7 +76,7 @@ class AddUserComp extends Component {
                         <Col sm="4"><Form.Control type="password" value={this.state.password} onChange={this.handleChange} id="password" name="password" /></Col>
                     </Form.Group>
 
-                    <Button onClick={this.submitHandler} variant="primary" >Ajouter l'utilisateur</Button>
+                    <Button as={Link} to={"/users"} onClick={this.submitHandler} variant="primary" >Ajouter l'utilisateur</Button>
                 </Form>
 
             </div>
@@ -80,4 +84,3 @@ class AddUserComp extends Component {
     }
 }
 
-export default AddUserComp;

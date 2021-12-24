@@ -1,19 +1,21 @@
 import './App.css';
-import ResponsiveNavbar from './components/ResponsiveNavbar'
+import MyRoutes from "./routes/MyRoutes";
+import {UserStore} from "./Utils/Store/User";
 import {useEffect} from "react";
 
 
-function App() {
+function App (){
 
-    useEffect(() => {
-        document.title = "Board'L"
-    }, [])
+        const user = UserStore.useState(s => s)
+        useEffect(() => {document.title = "OnBoard"});
+        return (
+            <div className="App">
+                <MyRoutes connectionState={user.auth}/>
+            </div>
+        );
 
-  return (
-      <div className="App">
-        <ResponsiveNavbar/>
-    </div>
-  );
+
+
 }
 
 export default App;

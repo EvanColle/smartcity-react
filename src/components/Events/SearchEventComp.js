@@ -1,15 +1,16 @@
 import React, {Component} from 'react';
-import {getEvent} from "../API";
+import {getEvent, getEvents, updateEvent, verifyEvent} from "../../Utils/API";
 import {Button, Col, Form, Row} from "react-bootstrap";
+import {Link} from "react-router-dom";
 
-class SearchEventComp extends Component {
+export default class SearchEventComp extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            searchId: "",
-            searchEvent: {},
+            searchId: 1,
+            selectOptions : [],
             creatorId: "",
             gameCategory: "",
             eventDate: "",
@@ -28,10 +29,22 @@ class SearchEventComp extends Component {
         this.handleModification = this.handleModification.bind(this);
     }
 
-    handleChange(e) {
+    componentDidMount() {
+        this.getSelectOptions();
+        console.log(this.state.searchId);
+    }
+
+    getSelectOptions(){
+        getEvents().then( res => this.setState({selectOptions : res})).catch((error) => alert(error));
+    }
+
+
+    handleChange(e){
         const name = e.target.name;
+        const type = e.target.type;
+        const value = type === 'checkbox' ? e.target.checked : e.target.value
         this.setState({
-                [name]: e.target.value,
+                [name] : value,
             }
         )
     }
@@ -53,26 +66,50 @@ class SearchEventComp extends Component {
                 isVerified: result.isverified,
                 nbMaxPlayer: result.nbmaxplayer,
                 adminMessage: result.adminmessage
-            }));
+            })).catch((error) => alert(error));
     }
 
-    handleModification(e) {
-        e.preventDefault();
+    async handleModification() {
+
+        let isValid = true;
+        const regexDate = /^\d{4}[-]\d{2}[-]\d{2}$/;
+        let errorMessage = "";
+
         const modifiedEvent = {
             creatorId: this.state.creatorId,
             gameCategory: this.state.gameCategory,
-            eventDate: this.state.eventDate,
+            eventDate: this.state.eventDate.slice(0,10),
             street: this.state.street,
             number: this.state.number,
             country: this.state.country,
             city: this.state.city,
             postalCode: this.state.postalCode,
             eventDescription: this.state.eventDescription,
-            isVerified: this.state.isVerified,
             nbMaxPlayer: this.state.nbMaxPlayer,
             adminMessage: this.state.adminMessage
         }
-        console.log(JSON.stringify(modifiedEvent))
+
+        for (const modifiedEventKey in modifiedEvent ) {
+
+            if(modifiedEvent[modifiedEventKey] === "eventDate") {
+                if (!modifiedEvent[modifiedEventKey].match(regexDate)) {
+                    errorMessage += "la date doit être rentrée au format yyyy-mm-dd : (" + modifiedEventKey + ')\n'
+                    isValid = false;
+                }
+            }
+            else if(modifiedEvent[modifiedEventKey] === ""){
+                errorMessage += "Ce champ doit être complété : (" + modifiedEventKey + ')\n'
+                isValid = false;
+            }
+        }
+
+        isValid ? await updateEvent(this.state.searchId, modifiedEvent).then(res => res).catch((error) => alert(error)) : alert(errorMessage);
+
+        const verification = {
+            adminMessage : this.state.adminMessage,
+            isVerified : this.state.isVerified
+        }
+        await verifyEvent(this.state.searchId, verification).then(res => res).catch((error) => alert(error));
     }
 
     render() {
@@ -80,9 +117,16 @@ class SearchEventComp extends Component {
             <div className="container-fluid">
                 <Form>
                     <Form.Group as={Row} className="mb-3" >
-                        <Form.Label column sm="2" >Id de l'événement à rechercher</Form.Label>
-                        <Col sm="2"><Form.Control value={this.state.searchId} onChange={this.handleChange} id="searchId" name="searchId"/></Col>
+                        <Form.Label column sm="2" >Evénements</Form.Label>
+                        <Col sm="4">
+                            <Form.Select value={this.state.searchId} onChange={this.handleChange} id="searchId" name="searchId">
+                                {this.state.selectOptions.map(
+                                    item => (<option key={parseInt(item.eventid)} value={parseInt(item.eventid)}> {`${parseInt(item.eventid)} - ${item.eventdescription} (${item.eventdate.slice(0,10)})`} </option>)
+                                )}
+                            </Form.Select>
+                        </Col>
                     </Form.Group>
+
                     <Button onClick={this.handleSearch} variant="primary" >Recherche</Button>
 
 
@@ -98,7 +142,7 @@ class SearchEventComp extends Component {
 
                     <Form.Group as={Row} className="mb-3" >
                         <Form.Label column sm="2">Date de l'événement</Form.Label>
-                        <Col sm="4"><Form.Control type="date" value={this.state.birthdate} onChange={this.handleChange} id="birthdate" name="birthdate" /></Col>
+                        <Col sm="4"><Form.Control type="text" value={this.state.eventDate.slice(0,10)} onChange={this.handleChange} id="eventDate" name="eventDate" /></Col>
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-3" >
@@ -141,11 +185,15 @@ class SearchEventComp extends Component {
                         <Col sm="4"><Form.Control type="text" value={this.state.adminMessage === null ? "" : this.state.adminMessage} onChange={this.handleChange} id="adminMessage" name="adminMessage" /></Col>
                     </Form.Group>
 
-                    <Button onClick={this.handleModification} variant="primary" >Modifier l'événement</Button>
+                    <Form.Group as={Row} className="mb-3" >
+                        <Form.Label column sm="2">Est vérifié</Form.Label>
+                        <Col sm="1"><Form.Check checked={this.state.isVerified} onChange={this.handleChange} id="isVerified" name="isVerified" /></Col>
+                    </Form.Group>
+
+                    <Button as={Link} to={"/events"} onClick={this.handleModification} variant="primary" >Modifier l'événement</Button>
 
                 </Form>
             </div>
         );
     }
 }
-export default SearchEventComp;

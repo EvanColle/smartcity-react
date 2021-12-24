@@ -1,14 +1,12 @@
 import React, { Component } from 'react'
 import {Button} from 'react-bootstrap';
-import {deleteGameCategory} from "../API";
+import {deleteGameCategory} from "../../Utils/API";
+
 export default class CategoriesLineComp extends Component {
 
     deleteHandler = event => {
-        alert(` L'élément ${this.props.categoryID} du tableau a été supprimé`);
         event.preventDefault();
-        deleteGameCategory(this.props.categoryID).then(res =>
-            res
-        );
+        deleteGameCategory(this.props.categoryID).then(res => res).catch((error) => {alert(error)});
     }
 
     render() {

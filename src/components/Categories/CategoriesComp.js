@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import {Table} from 'react-bootstrap'
 import CategoriesLineComp from './CategoriesLineComp'
-import {getCategories} from "../API";
-
+import {getGameCategories} from "../../Utils/API";
 
 export default class CategoriesComp extends Component {
 
@@ -14,20 +13,28 @@ export default class CategoriesComp extends Component {
         }
     }
     componentDidMount() {
-        getCategories()
-            .then(result => this.setState({categories : result}))
+        this.mounted = true;
+        getGameCategories()
+            .then(result => {
+                if(this.mounted)
+                    this.setState({categories : result} )
+            })
             .catch(error => alert(error));
     }
-    /*componentDidUpdate(prevProps, prevState, snapshot) {
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
         if(this.state.loadCategories){
-            getCategories()
+            getGameCategories()
                 .then(result => {
-                    if(prevState.category !== result)
+                    if(prevState.category !== result && this.mounted)
                         this.setState({categories : result})
                 })
                 .catch(error => alert(error));
         }
-    }*/
+    }
+    componentWillUnmount() {
+        this.mounted = false;
+    }
 
     render() {
         return (

@@ -1,16 +1,15 @@
 import React, {Component} from 'react';
 import {Button, Col, Form, Row} from "react-bootstrap";
-import {getCategories, getCategory, getUsers, updateGameCategory} from "../API";
+import {getGameCategories, getGameCategory, updateGameCategory} from "../../Utils/API";
 import {Link} from "react-router-dom";
 
-class SearchCategoryComp extends Component {
+export default class SearchCategoryComp extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            searchId : "",
+            searchId : 1,
             categoriesOptions : [],
-            searchCategory : {},
             label : "",
             description : ""
         }
@@ -25,7 +24,7 @@ class SearchCategoryComp extends Component {
     }
 
     getSelectOptions(){
-        getCategories().then( res => this.setState({categoriesOptions : res }));
+        getGameCategories().then(res => this.setState({categoriesOptions : res })).catch((error) => alert(error));
     }
 
     handleChange(e){
@@ -38,19 +37,17 @@ class SearchCategoryComp extends Component {
 
     handleSearch(e){
         e.preventDefault();
-        getCategory(this.state.searchId).then(result => this.setState(
-            {searchCategory : result[0],
+        getGameCategory(this.state.searchId).then(result => this.setState(
+            {
                 label : result[0].label,
                 description : result[0].description,
-            }));
+            })).catch((error) => alert(error));
 
     }
 
     async handleModification(){
-
         const modifiedCategory = {"label" : this.state.label, "description" : this.state.description};
-        alert(`La catégorie de jeu d'id ${this.state.searchId} a été modifiée`);
-        await updateGameCategory(this.state.searchId,modifiedCategory);
+        this.state.label !== "" & this.state.description !== "" ? await updateGameCategory(this.state.searchId,modifiedCategory).then(res => res).catch((error) => alert(error)) : alert("Vous devez remplir tous les champs");
     }
 
     render() {
@@ -87,4 +84,3 @@ class SearchCategoryComp extends Component {
     }
 }
 
-export default SearchCategoryComp;

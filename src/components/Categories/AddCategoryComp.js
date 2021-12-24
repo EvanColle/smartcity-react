@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import {Button, Col, Form, Row} from "react-bootstrap";
-import {postGameCategory} from "../API";
+import {postGameCategory} from "../../Utils/API";
 import {Link} from "react-router-dom";
 
-class AddCategoryComp extends Component {
+export default  class AddCategoryComp extends Component {
 
     constructor(props) {
         super(props);
@@ -22,15 +22,17 @@ class AddCategoryComp extends Component {
             }
         )
     }
-    // TO DO : faire appel à la méthode d'ajout : demander à Augustin
-     async submitHandler() {
-        await postGameCategory(this.state);
 
+    async submitHandler() {
+        if(this.state.label !== "" && this.state.description)
+            await postGameCategory(this.state).then(res => res.data).catch((error) => {alert(error)});
+        else
+            alert("Vous devez remplir tous les champs");
     }
 
     render() {
         return (
-            <div>
+            <div className="container">
                 <Form>
                     <Form.Group as={Row} className="mb-3" >
                         <Form.Label column sm="2" >Label</Form.Label>
@@ -49,5 +51,3 @@ class AddCategoryComp extends Component {
         );
     }
 }
-
-export default AddCategoryComp;

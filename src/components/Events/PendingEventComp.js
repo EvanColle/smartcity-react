@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
+import EventComp from "./EventComp";
 
 export default class PendingEventComp extends Component {
+
     render() {
         return (
             <div>
-                <h1>Pending</h1>
+                <EventComp isPending={true} />
             </div>
         )
     }

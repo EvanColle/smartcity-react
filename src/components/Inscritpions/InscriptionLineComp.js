@@ -1,14 +1,12 @@
 import React, { Component } from 'react'
 import {Button} from 'react-bootstrap'
-import {deleteInscription} from "../API";
+import {deleteInscription} from "../../Utils/API";
 
 export default class InscriptionLineComp extends Component {
 
     deleteHandler = event =>  {
-        console.log(this);
-        alert(`L'élément ${this.props.inscriptionId} du tableau a été supprimé`);
         event.preventDefault();
-        deleteInscription(this.props.inscriptionId).then(res => console.log(res));
+        deleteInscription(this.props.inscriptionId).then(res => res.data).catch((error) => alert(error));
     }
 
     render() {
